@@ -48,20 +48,17 @@ def bot_message(message):
             bot.send_message(message.chat.id,'⬅️Назад',reply_markup=markup)
 
         if message.text == 'Сделать заказ📦':
-
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            bot.send_message(message.chat.id, 'Заполните заявку по примеру ниже, указывая свои данные',reply_markup=markup)
             bot.register_next_step_handler(message, start_order)
 
 def start_order(message):
+    bot.send_message(message.chat.id, 'Введите ваше ФИО!')
     conn = sqlite3.connect('database.sql')
     cursor = conn.cursor()
-    cursor.execute(f'CREATE TABLE IF NOT EXISTS userOrder (id int auto_increment primary key, full_name VARCHAR(50), phone_number VARCHAR(20), address VARCHAR(30), post_address VARCHAR(30))')
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS userOrder (id int auto_increment primary key, full_name TEXT(50), phone_number TEXT(20), address TEXT(30), post_address TEXT(30))')
     conn.commit()
     cursor.close()
     conn.close()
     global user_name
-    bot.send_message(message.chat.id, 'Введите ваше ФИО!')
     user_name = message.text.strip()
     bot.register_next_step_handler(message, phone_usernumber)
 
@@ -83,7 +80,7 @@ def post_useraddress(message):
     user_post_address = message.text.strip()
     conn = sqlite3.connect('database.sql')
     cur = conn.cursor()
-    cur.execute(f'INSERT INTO userOrder (full_username, phone_usernumber, useraddress, post_useradress) VALUES ("%s", "%s", "%s", "%s") % (user_name, user_phone, user_address, user_post_address)')
+    cur.execute(f'INSERT INTO userOrder (full_name, phone_number, address, post_address) VALUES (%s, %s, %s, %s)',(user_name, user_phone, user_address, user_post_address))
     conn.commit()
     cur.close()
     conn.close()
