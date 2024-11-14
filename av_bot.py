@@ -11,6 +11,8 @@ user_address = None
 user_post_address = None
 ordi = None
 
+ADMIN_IDS = [5242512520]
+
 full_user_order = ''
 
 @bot.message_handler(commands=['start'])
@@ -19,12 +21,18 @@ def start(message):
     goods = types.KeyboardButton('Наши товары🛍️')
     feedback = types.KeyboardButton('Обратная связь☎️')
     order1 = types.KeyboardButton('Сделать заказ📦')
-    markup.add(goods, feedback, order1)
+    adm = types.KeyboardButton('AdM PaNeI_❌')
+    if message.chat.id in ADMIN_IDS:
+        markup.add(goods, feedback, order1, adm)
+    else:
+        markup.add(goods, feedback, order1)
+
     bot.send_message(message.chat.id,'Здравствуйте, рады вас приветствовать в нашем магазине!\nНадеемся, вы подберете что-то для себя!',reply_markup=markup)
 
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     if message.chat.type == 'private':
+
         if message.text == 'Обратная связь☎️':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             back = types.KeyboardButton('⬅️Назад')
@@ -45,11 +53,21 @@ def bot_message(message):
             markup.add(goods, feedback, order1)
             bot.send_message(message.chat.id, '⬅️Назад', reply_markup = markup)
 
+        elif message.text == 'AdM PaNeI_❌':
+            markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+            add_goods = types.KeyboardButton('Добавить товар🛍️')
+            delete_goods = types.KeyboardButton('Удалить товар❌')
+            back = types.KeyboardButton('⬅️Назад')
+            markup.add(add_goods).add(delete_goods).add(back)
+            bot.send_message(message.chat.id, 'AdM PaNeI_❌', reply_markup = markup)
+
         elif message.text == 'Сделать заказ📦':
             bot.send_message(message.chat.id, 'Сделать заказ📦')
             start_order(message)
 
 def start_order(message):
+
+
     bot.send_message(message.chat.id, 'Введите ваше ФИО!')
     global full_user_order
     full_user_order = 'Ваше ФИО: \n'
