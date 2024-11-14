@@ -13,8 +13,22 @@ ordi = None
 
 ADMIN_IDS = [5242512520]
 
+DEFAULT_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад']
+
+ADM_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад', 'AdM PaNeI_❌', 'Добавить товар🛍️', 'Удалить товар❌']
+
 full_user_order = ''
 
+@bot.message_handler(commands = ['admin_panel'])
+def admin(message):
+    if message.chat.id in ADMIN_IDS:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+        adm = types.KeyboardButton('AdM PaNeI_❌')
+        markup.add(adm)
+        bot.send_message(message.chat.id, 'You are admin!', reply_markup = markup)
+    else:
+        bot.send_message(message.chat.id, "You aren't admin")
+        start(message)
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -33,7 +47,32 @@ def start(message):
 def bot_message(message):
     if message.chat.type == 'private':
 
-        if message.text == 'Обратная связь☎️':
+        if message.text not in DEFAULT_BUTTONS:
+            if message.chat.id not in ADMIN_IDS:
+                bot.send_message(message.chat.id, 'Ошибка❌')
+
+        if message.text not in ADM_BUTTONS:
+            if message.chat.id in ADMIN_IDS:
+                bot.send_message(message.chat.id, 'Ошибка❌')
+
+        if message.text == 'AdM PaNeI_❌':
+            if message.chat.id in ADMIN_IDS:
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                add_goods = types.KeyboardButton('Добавить товар🛍️')
+                delete_goods = types.KeyboardButton('Удалить товар❌')
+                back = types.KeyboardButton('⬅️Назад')
+                markup.add(add_goods).add(delete_goods).add(back)
+                bot.send_message(message.chat.id, 'AdM PaNeI_❌', reply_markup=markup)
+
+            else:
+                bot.send_message(message.chat.id, 'Ошибка!')
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                goods = types.KeyboardButton('Наши товары🛍️')
+                feedback = types.KeyboardButton('Обратная связь☎️')
+                order1 = types.KeyboardButton('Сделать заказ📦')
+                markup.add(goods, feedback, order1)
+
+        elif message.text == 'Обратная связь☎️':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             back = types.KeyboardButton('⬅️Назад')
             markup.add(back)
@@ -67,7 +106,6 @@ def bot_message(message):
 
 def start_order(message):
 
-
     bot.send_message(message.chat.id, 'Введите ваше ФИО!')
     global full_user_order
     full_user_order = 'Ваше ФИО: \n'
@@ -85,33 +123,33 @@ def start_order(message):
 
 def phone_usernumber(message):
     global user_name
-    user_name = message.text.strip()  # Сохраняем ФИО
+    user_name = message.text.strip()
     bot.send_message(message.chat.id, 'Введите ваш номер телефона!')
     global full_user_order
-    full_user_order = 'Ваше ФИО: ' + user_name + '\n'  # Добавляем ФИО в заказ
+    full_user_order = 'Ваше ФИО: ' + user_name + '\n'
     bot.register_next_step_handler(message, useraddress)
 
 def useraddress(message):
     global user_phone
-    user_phone = message.text.strip()  # Сохраняем номер телефона
+    user_phone = message.text.strip()
     bot.send_message(message.chat.id, 'Введите ваш адрес!')
     global full_user_order
-    full_user_order += 'Ваш номер телефона: ' + user_phone + '\n'  # Добавляем номер телефона в заказ
+    full_user_order += 'Ваш номер телефона: ' + user_phone + '\n'
     bot.register_next_step_handler(message, post_useraddress)
 
 def post_useraddress(message):
     global user_address
-    user_address = message.text.strip()  # Сохраняем адрес
+    user_address = message.text.strip()
     bot.send_message(message.chat.id, 'Введите адрес ближайшего почтового отделения!')
     global full_user_order
-    full_user_order += 'Ваш адрес: ' + user_address + '\n'  # Добавляем адрес в заказ
+    full_user_order += 'Ваш адрес: ' + user_address + '\n'
     bot.register_next_step_handler(message, final_post_useraddress)
 
 def final_post_useraddress(message):
     global user_post_address
-    user_post_address = message.text.strip()  # Сохраняем адрес ближайшего почтового отделения
+    user_post_address = message.text.strip()
     global full_user_order
-    full_user_order += 'Адрес ближайшего почтового отделения: ' + user_post_address + '\n'  # Добавляем полный заказ
+    full_user_order += 'Адрес ближайшего почтового отделения: ' + user_post_address + '\n'
 
     conn = sqlite3.connect('database.sql')
     cur = conn.cursor()
@@ -124,6 +162,7 @@ def final_post_useraddress(message):
     bot.send_message('@AndreyTestChat', full_user_order)
     bot.send_message(message.chat.id, 'Ваш заказ успешно оформлен!')
     start(message)
+
 
 
 bot.polling(none_stop = True)
