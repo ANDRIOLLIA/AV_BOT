@@ -116,6 +116,7 @@ def bot_message(message):
 #             bot.send_message(message.chat.id, 'Ошибка❌')
 #             func(message)
 
+# создать функцию проверки
 
 def start_order(message):
 
@@ -137,14 +138,7 @@ def start_order(message):
 def add_user_name(message):
     global user_name
     user_name = message.text.strip()
-    if message.chat.id not in ADMIN_IDS:
-        while message.text in DEFAULT_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_name(message)
-    if message.chat.id in ADMIN_IDS:
-        while message.text in ADM_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_name(message)
+
     bot.send_message(message.chat.id, 'Введите ваш номер телефона!')
     global full_user_order
     full_user_order = 'Ваше ФИО: ' + user_name + '\n'
@@ -153,15 +147,7 @@ def add_user_name(message):
 def add_user_phone(message):
     global user_phone
     user_phone = message.text.strip()
-    if message.chat.id not in ADMIN_IDS:
-        while message.text in DEFAULT_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_phone(message)
-    if message.chat.id in ADMIN_IDS:
-        while message.text in ADM_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_phone(message)
-    bot.send_message(message.chat.id, 'Введите ваш адрес!')
+
     global full_user_order
     full_user_order += 'Ваш номер телефона: ' + user_phone + '\n'
     bot.register_next_step_handler(message, add_user_address)
@@ -169,15 +155,7 @@ def add_user_phone(message):
 def add_user_address(message):
     global user_address
     user_address = message.text.strip()
-    if message.chat.id not in ADMIN_IDS:
-        while message.text in DEFAULT_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_address(message)
-    if message.chat.id in ADMIN_IDS:
-        while message.text in ADM_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_address(message)
-    bot.send_message(message.chat.id, 'Введите адрес ближайшего почтового отделения!')
+
     global full_user_order
     full_user_order += 'Ваш адрес: ' + user_address + '\n'
     bot.register_next_step_handler(message, add_user_post_address)
@@ -185,14 +163,7 @@ def add_user_address(message):
 def add_user_post_address(message):
     global user_post_address
     user_post_address = message.text.strip()
-    if message.chat.id not in ADMIN_IDS:
-        while message.text in DEFAULT_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_post_address(message)
-    if message.chat.id in ADMIN_IDS:
-        while message.text in ADM_BUTTONS:
-            bot.send_message(message.chat.id, 'Ошибка❌')
-            add_user_post_address(message)
+
     global full_user_order
     full_user_order += 'Адрес ближайшего почтового отделения: ' + user_post_address + '\n'
 
