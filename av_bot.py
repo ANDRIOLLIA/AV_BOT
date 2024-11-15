@@ -176,7 +176,7 @@ def add_user_post_address(message):
 
     bot.send_message(message.chat.id, full_user_order)
     str_user_id = str(user_id)
-    admin_full_user_order = 'ID пользователя: ' + str_user_id + '\n' + full_user_order
+    admin_full_user_order = 'ID пользователя: @' + str_user_id + '\n' + full_user_order
     bot.send_message('@AndreyTestChat', admin_full_user_order)
     bot.send_message(message.chat.id, 'Ваш заказ успешно оформлен!')
     start(message)
