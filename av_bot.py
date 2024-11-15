@@ -11,11 +11,16 @@ user_address = None
 user_post_address = None
 ordi = None
 
+user_id = None
+
 ADMIN_IDS = [5242512520]
 
-DEFAULT_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад']
+DEFAULT_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад', 'Ошибка❌']
 
-ADM_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад', 'AdM PaNeI_❌', 'Добавить товар🛍️', 'Удалить товар❌']
+ADM_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад', 'AdM PaNeI_❌', 'Добавить товар🛍️', 'Удалить товар❌', 'Ошибка❌']
+
+# exception_phrases = ['You are admin!',"You aren't admin",'Здравствуйте, рады вас приветствовать в нашем магазине!\nНадеемся, вы подберете что-то для себя!','Если у вас есть вопросы или предложения, то вы можете обратиться к ним:\n1.@sddmnx',
+#                      'Введите ваше ФИО!','Введите ваш номер телефона!','Введите ваш адрес!','Введите адрес ближайшего почтового отделения!', 'Ваш заказ успешно оформлен!', 'Ошибка❌']
 
 full_user_order = ''
 
@@ -46,7 +51,8 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     if message.chat.type == 'private':
-
+        global user_id
+        user_id = message.from_user.username #username - то, что идет после "@"
         if message.text not in DEFAULT_BUTTONS:
             if message.chat.id not in ADMIN_IDS:
                 bot.send_message(message.chat.id, 'Ошибка❌')
@@ -104,6 +110,13 @@ def bot_message(message):
             bot.send_message(message.chat.id, 'Сделать заказ📦')
             start_order(message)
 
+# def order_check(message):
+#     if message.chat.id not in ADMIN_IDS:
+#         if message.text not in DEFAULT_BUTTONS or exception_phrases:
+#             bot.send_message(message.chat.id, 'Ошибка❌')
+#             func(message)
+
+
 def start_order(message):
 
     bot.send_message(message.chat.id, 'Введите ваше ФИО!')
@@ -119,35 +132,67 @@ def start_order(message):
     cursor.close()
     conn.close()
 
-    bot.register_next_step_handler(message, phone_usernumber)
+    bot.register_next_step_handler(message, add_user_name)
 
-def phone_usernumber(message):
+def add_user_name(message):
     global user_name
     user_name = message.text.strip()
+    if message.chat.id not in ADMIN_IDS:
+        while message.text in DEFAULT_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_name(message)
+    if message.chat.id in ADMIN_IDS:
+        while message.text in ADM_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_name(message)
     bot.send_message(message.chat.id, 'Введите ваш номер телефона!')
     global full_user_order
     full_user_order = 'Ваше ФИО: ' + user_name + '\n'
-    bot.register_next_step_handler(message, useraddress)
+    bot.register_next_step_handler(message, add_user_phone)
 
-def useraddress(message):
+def add_user_phone(message):
     global user_phone
     user_phone = message.text.strip()
+    if message.chat.id not in ADMIN_IDS:
+        while message.text in DEFAULT_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_phone(message)
+    if message.chat.id in ADMIN_IDS:
+        while message.text in ADM_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_phone(message)
     bot.send_message(message.chat.id, 'Введите ваш адрес!')
     global full_user_order
     full_user_order += 'Ваш номер телефона: ' + user_phone + '\n'
-    bot.register_next_step_handler(message, post_useraddress)
+    bot.register_next_step_handler(message, add_user_address)
 
-def post_useraddress(message):
+def add_user_address(message):
     global user_address
     user_address = message.text.strip()
+    if message.chat.id not in ADMIN_IDS:
+        while message.text in DEFAULT_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_address(message)
+    if message.chat.id in ADMIN_IDS:
+        while message.text in ADM_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_address(message)
     bot.send_message(message.chat.id, 'Введите адрес ближайшего почтового отделения!')
     global full_user_order
     full_user_order += 'Ваш адрес: ' + user_address + '\n'
-    bot.register_next_step_handler(message, final_post_useraddress)
+    bot.register_next_step_handler(message, add_user_post_address)
 
-def final_post_useraddress(message):
+def add_user_post_address(message):
     global user_post_address
     user_post_address = message.text.strip()
+    if message.chat.id not in ADMIN_IDS:
+        while message.text in DEFAULT_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_post_address(message)
+    if message.chat.id in ADMIN_IDS:
+        while message.text in ADM_BUTTONS:
+            bot.send_message(message.chat.id, 'Ошибка❌')
+            add_user_post_address(message)
     global full_user_order
     full_user_order += 'Адрес ближайшего почтового отделения: ' + user_post_address + '\n'
 
@@ -159,10 +204,10 @@ def final_post_useraddress(message):
     conn.close()
 
     bot.send_message(message.chat.id, full_user_order)
-    bot.send_message('@AndreyTestChat', full_user_order)
+    str_user_id = str(user_id)
+    admin_full_user_order = 'ID пользователя: ' + str_user_id + '\n' + full_user_order
+    bot.send_message('@AndreyTestChat', admin_full_user_order)
     bot.send_message(message.chat.id, 'Ваш заказ успешно оформлен!')
     start(message)
-
-
 
 bot.polling(none_stop = True)
