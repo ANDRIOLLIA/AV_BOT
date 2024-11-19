@@ -2,26 +2,11 @@ import telebot
 from telebot import types
 import sqlite3
 
+import administrator
+from administrator import *
+
 token = '7674116155:AAHi_bfHnnmjho00x_Df1LsU3kMNu-kdTeE'
 bot = telebot.TeleBot(token)
-
-user_name = None
-user_phone = None
-user_address = None
-user_post_address = None
-ordi = None
-is_ordering = False
-
-
-user_id = None
-
-ADMIN_IDS = [5242512520]
-
-DEFAULT_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад', 'Ошибка❌']
-
-ADM_BUTTONS = ['Наши товары🛍️','Обратная связь☎️','Сделать заказ📦','⬅️Назад', 'AdM PaNeI_❌', 'Добавить товар🛍️', 'Удалить товар❌', 'Ошибка❌']
-
-full_user_order = ''
 
 @bot.message_handler(commands = ['admin_panel'])
 def admin(message):
@@ -50,8 +35,7 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     if message.chat.type == 'private':
-        global user_id
-        user_id = message.from_user.username #username - то, что идет после "@"
+        administrator.user_id = message.from_user.username #username - то, что идет после "@"
         if message.text not in DEFAULT_BUTTONS:
             if message.chat.id not in ADMIN_IDS:
                 bot.send_message(message.chat.id, 'Ошибка❌')
@@ -113,37 +97,32 @@ def bot_message(message):
 
 # НАЧАЛО СОЗДАНИЯ ЗАКАЗА
 def start_order(message):
-    global is_ordering
-    is_ordering = True
+    administrator.is_ordering = True
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     cancel_button = types.KeyboardButton('🛑 Отмена')
     markup.add(cancel_button)
 
     bot.send_message(message.chat.id, 'Введите ваше ФИО!', reply_markup=markup)
-    global full_user_order
-    full_user_order = 'Ваше ФИО: \n'
+    administrator.full_user_order = 'Ваше ФИО: \n'
     bot.register_next_step_handler(message, add_user_name)
 
 def cancel_order(message):
-    global is_ordering
-    is_ordering = False
+    administrator.is_ordering = False
     bot.send_message(message.chat.id,'Создание заказа отменено!')
     start(message)
 
 def add_user_name(message):
-    global user_name
-    if not is_ordering:
+    if not administrator.is_ordering:
         return
 
     if message.text == '🛑 Отмена':
         cancel_order(message)
         return
 
-    user_name = message.text.strip()
+    administrator.user_name = message.text.strip()
     bot.send_message(message.chat.id, 'Введите ваш номер телефона!')
-    global full_user_order
-    full_user_order = 'Ваше ФИО: ' + user_name + '\n'
+    administrator.full_user_order = 'Ваше ФИО: ' + user_name + '\n'
     bot.register_next_step_handler(message, add_user_phone)
 
 
@@ -155,10 +134,8 @@ def add_user_phone(message):
         cancel_order(message)
         return
 
-    global user_phone
-    user_phone = message.text.strip()
-    global full_user_order
-    full_user_order += 'Ваш номер телефона: ' + user_phone + '\n'
+    administrator.user_phone = message.text.strip()
+    administrator.full_user_order += 'Ваш номер телефона: ' + user_phone + '\n'
     bot.send_message(message.chat.id, 'Введите ваш адрес!')
     bot.register_next_step_handler(message, add_user_address)
 
@@ -170,26 +147,21 @@ def add_user_address(message):
         cancel_order(message)
         return
 
-    global user_address
-    user_address = message.text.strip()
-    global full_user_order
-    full_user_order += 'Ваш адрес: ' + user_address + '\n'
+    administrator.user_address = message.text.strip()
+    administrator.full_user_order += 'Ваш адрес: ' + user_address + '\n'
     bot.send_message(message.chat.id, 'Введите адрес ближайшего почтового отделения!')
     bot.register_next_step_handler(message, add_user_post_address)
 
 def add_user_post_address(message):
-    global is_ordering
-    if not is_ordering:
+    if not administrator.is_ordering:
         return
 
     if message.text == '🛑 Отмена':
         cancel_order(message)
         return
 
-    global user_post_address
-    user_post_address = message.text.strip()
-    global full_user_order
-    full_user_order += 'Адрес ближайшего почтового отделения: ' + user_post_address + '\n'
+    administrator.user_post_address = message.text.strip()
+    administrator.full_user_order += 'Адрес ближайшего почтового отделения: ' + user_post_address + '\n'
 
     conn = sqlite3.connect('database.sql')
     cur = conn.cursor()
@@ -199,9 +171,9 @@ def add_user_post_address(message):
     cur.close()
     conn.close()
 
-    bot.send_message(message.chat.id, full_user_order)
+    bot.send_message(message.chat.id, administrator.full_user_order)
     bot.send_message(message.chat.id, 'Ваш заказ успешно оформлен!')
-    is_ordering = False
+    administrator.is_ordering = False
     start(message)
 
 bot.polling(none_stop=True)
