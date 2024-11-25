@@ -2,27 +2,14 @@ import telebot
 from telebot import types
 import sqlite3
 
+import dbs
+from dbs import *
+
 import administrator
 from administrator import *
 
 token = '7674116155:AAHi_bfHnnmjho00x_Df1LsU3kMNu-kdTeE'
 bot = telebot.TeleBot(token)
-
-
-def init_user_order_db():
-    conn = sqlite3.connect('database.sql')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS userOrder (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT,
-            phone_number TEXT,
-            address TEXT,
-            post_address TEXT)
-    ''')
-    conn.commit()
-    cursor.close()
-    conn.close()
 
 @bot.message_handler(commands=['admin_panel'])
 def admin(message):
@@ -189,5 +176,5 @@ def add_user_post_address(message):
     administrator.is_ordering = False
     start(message)
 
-init_user_order_db()
+dbs.init_user_order_db()
 bot.polling(none_stop=True)
