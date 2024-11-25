@@ -9,7 +9,7 @@ token = '7674116155:AAHi_bfHnnmjho00x_Df1LsU3kMNu-kdTeE'
 bot = telebot.TeleBot(token)
 
 
-def init_db():
+def init_user_order_db():
     conn = sqlite3.connect('database.sql')
     cursor = conn.cursor()
     cursor.execute('''
@@ -189,5 +189,5 @@ def add_user_post_address(message):
     administrator.is_ordering = False
     start(message)
 
-init_db()
+init_user_order_db()
 bot.polling(none_stop=True)
