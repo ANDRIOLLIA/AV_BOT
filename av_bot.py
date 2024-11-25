@@ -189,5 +189,5 @@ def add_user_post_address(message):
     administrator.is_ordering = False
     start(message)
 
-init_db()  # Инициализация базы данных
+init_db()
 bot.polling(none_stop=True)
