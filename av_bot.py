@@ -184,7 +184,7 @@ def add_user_post_address(message):
     conn.close()
 
     bot.send_message(message.chat.id, administrator.full_user_order)
-    bot.send_message('@AndreyTestChat', 'Тег в телеграме: @' + administrator.user_id + '\n' + administrator.full_user_order)
+    bot.send_message('@AndreyTestChat', 'Тег пользователя: @' + administrator.user_id + '\n' + administrator.full_user_order)
     bot.send_message(message.chat.id, 'Ваш заказ успешно оформлен!')
     administrator.is_ordering = False
     start(message)
