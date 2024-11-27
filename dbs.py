@@ -28,3 +28,13 @@ def init_product_db():
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def get_product_by_id(product_id):
+    conn = sqlite3.connect('products.sql')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Products WHERE id = ?", (product_id,))
+    product = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return product
