@@ -14,3 +14,17 @@ def init_user_order_db():
     conn.commit()
     cursor.close()
     conn.close()
+
+def init_product_db():
+    conn = sqlite3.connect('products.sql')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prod_name TEXT,
+            description TEXT,
+            price TEXT)
+    ''')
+    conn.commit()
+    cursor.close()
+    conn.close()

@@ -1,6 +1,6 @@
 import telebot
 from telebot import types
-import sqlite3
+# import sqlite3
 
 import dbs
 from dbs import *
@@ -21,6 +21,58 @@ def admin(message):
     else:
         bot.send_message(message.chat.id, 'Вы не Админ!')
         start(message)
+
+@bot.message_handler(commands = ['new_item'])
+def new_item(message):
+    if message.chat.id in ADMIN_IDS:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        back = types.KeyboardButton('⬅️Назад')
+        markup.add(back)
+        bot.send_message(message.chat.id, 'Добавление товара🛍️')
+        init_product_db()
+        start_creation_product(message)
+    else:
+        bot.send_message(message.chat.id, 'Ошибка❌')
+        start(message)
+
+def start_creation_product(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    back = types.KeyboardButton('⬅️Назад')
+    markup.add(back)
+    bot.send_message(message.chat.id, 'Введите название товара!', reply_markup=markup)
+    bot.register_next_step_handler(message, add_product_name)
+
+def add_product_name(message):
+    administrator.product_name = message.text.strip()
+    administrator.full_product += 'Название: ' + administrator.product_name + '\n'
+    bot.send_message(message.chat.id, 'Введите описание товара!')
+    bot.register_next_step_handler(message, add_user_address)
+
+def add_product_description(message):
+    administrator.product_description = message.text.strip()
+    administrator.full_product += 'Описание: ' + administrator.product_description + '\n'
+    bot.send_message(message.chat.id, 'Введите цену товара')
+    bot.register_next_step_handler(message, add_product_price)
+
+def add_product_price(message):
+    administrator.product_price = message.text.strip()
+    administrator.full_product += 'Цена: ' + administrator.product_price + '\n'
+    conn = sqlite3.connect('products.sql')
+    cur = conn.cursor()
+    cur.execute('INSERT INTO Products '
+                '(prod_name, '
+                'description,'
+                'price) '
+                'VALUES (?, ?, ?)',
+                (administrator.product_name,
+                administrator.product_description,
+                administrator.product_price))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    bot.send_message(message.chat.id, 'Товар добавлен!')
+    bot.send_message(message.chat.id, administrator.full_product)
 
 @bot.message_handler(commands=['start'])
 def start(message):
