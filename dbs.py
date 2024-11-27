@@ -15,19 +15,6 @@ def init_user_order_db():
     cursor.close()
     conn.close()
 
-def init_products():
-    conn = sqlite3.connect('products.sql')
-    cursor = conn.cursor()
-    cursor.execute('''
-            CREATE TABLE IF NOT EXISTS Products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                prod_name TEXT,
-                description TEXT)
-        ''')
-    conn.commit()
-    cursor.close()
-    conn.close()
-
 def init_product_db():
     conn = sqlite3.connect('products.sql')
     cursor = conn.cursor()
@@ -38,10 +25,10 @@ def init_product_db():
             description TEXT,
             price TEXT)
     ''')
+    # cursor.execute('DROP TABLE IF EXISTS Products')
     conn.commit()
     cursor.close()
     conn.close()
-
 
 def get_product_by_id(product_id):
     conn = sqlite3.connect('products.sql')
