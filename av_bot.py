@@ -73,6 +73,11 @@ def add_product_price(message):
     bot.send_message(message.chat.id, 'Товар добавлен!')
     bot.send_message(message.chat.id, administrator.full_product)
 
+@bot.message_handler(func=lambda message: message.text == 'Следующий товар➡️')
+def next_product_button(message):
+    next_button.current_product_id += 1
+    next_button.next_product(message)
+
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -105,7 +110,7 @@ def bot_message(message):
                 add_goods = types.KeyboardButton('Добавить товар🛍️')
                 delete_goods = types.KeyboardButton('Удалить товар❌')
                 back = types.KeyboardButton('⬅️Назад')
-                markup.add(add_goods, delete_goods, back)
+                markup.add(add_goods, delete_goods).add(back)
                 bot.send_message(message.chat.id, 'AdM PaNeI_❌', reply_markup=markup)
 
             else:
@@ -128,8 +133,6 @@ def bot_message(message):
         elif message.text == 'Наши товары🛍️':
             next_button.send_product(message)
 
-        elif message.text == 'Следующий товар➡️':
-            next_button.next_product(message)
 
         elif message.text == '⬅️Назад':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -228,8 +231,6 @@ def add_user_post_address(message):
     bot.send_message(message.chat.id, 'Ваш заказ успешно оформлен!')
     administrator.is_ordering = False
     start(message)
-
-
 
 dbs.init_user_order_db()
 bot.polling(none_stop=True)
