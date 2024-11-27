@@ -21,12 +21,12 @@ def send_product(message):
     product = get_product_by_id(current_product_id)
 
     if product:
-        response = f"ID продукта: {product[0]}\n" \
+        response = f"Артикул: {product[0]}\n" \
                    f"Название продукта: {product[1]}\n" \
                    f"Описание: {product[2]}\n" \
                    f"Цена: {product[3]}"
     else:
-        response = '️⬅️Назад'
+        response = 'Товар не найден, нажмите кнопку "⬅️Назад"'
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     back = types.KeyboardButton('⬅️Назад')
@@ -40,18 +40,20 @@ def next_product(message):
     product = get_product_by_id(current_product_id)
 
     if product:
-        response = f"ID продукта: {product[0]}\n" \
+        response = f"Артикул: {product[0]}\n" \
                    f"Название продукта: {product[1]}\n" \
                    f"Описание: {product[2]}\n" \
                    f"Цена: {product[3]}"
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        back = types.KeyboardButton('⬅️Назад')
+        next_prod = types.KeyboardButton('Следующий товар➡️')
+        markup.add(back).add(next_prod)
     else:
-        response = '⬅️Назад'
+        response = 'Список товаров закончился. Хотите оформить заказ?'
 
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    back = types.KeyboardButton('⬅️Назад')
-    next_prod = types.KeyboardButton('Следующий товар➡️')
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        yes_button = types.KeyboardButton('Да✅')
+        back_button = types.KeyboardButton('⬅️Назад')
+        markup.add(yes_button).add(back_button)
 
-    markup.add(back).add(next_prod)
     bot.send_message(message.chat.id, response, reply_markup=markup)
-
-

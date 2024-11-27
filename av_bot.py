@@ -73,10 +73,27 @@ def add_product_price(message):
     bot.send_message(message.chat.id, 'Товар добавлен!')
     bot.send_message(message.chat.id, administrator.full_product)
 
+@bot.message_handler(func=lambda message: message.text == 'Да✅')
+def yes(message):
+    start_order(message)
+
 @bot.message_handler(func=lambda message: message.text == 'Следующий товар➡️')
 def next_product_button(message):
     next_button.current_product_id += 1
     next_button.next_product(message)
+
+@bot.message_handler(commands=['new_product'])
+def new_product(message):
+    if message.chat.id in ADMIN_IDS:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        new_prod = types.KeyboardButton('Добавить товар🛍️')
+        markup.add(new_prod)
+        bot.send_message(message.chat.id, 'Добавить товар🛍️', reply_markup=markup)
+        dbs.init_products()
+    else:
+        bot.send_message(message.chat.id, 'Ошибка❌')
+        start(message)
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
