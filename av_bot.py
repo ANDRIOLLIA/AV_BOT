@@ -24,7 +24,7 @@ def admin(message):
         bot.send_message(message.chat.id, 'Вы не Админ!')
         start(message)
 
-@bot.message_handler(commands = ['new_item'])
+@bot.message_handler(func=lambda message: message.text == 'Добавить товар🛍️')
 def new_item(message):
     if message.chat.id in ADMIN_IDS:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -72,6 +72,35 @@ def add_product_price(message):
 
     bot.send_message(message.chat.id, 'Товар добавлен!')
     bot.send_message(message.chat.id, administrator.full_product)
+
+
+user_states = {}
+
+
+@bot.message_handler(commands=['delete'])
+def start_delete(message):
+    user_states[message.chat.id] = 'awaiting_id'
+    bot.send_message(message.chat.id, 'Введите артикул товара (Столбец ID в базе данных):')
+
+
+@bot.message_handler(func=lambda message: user_states.get(message.chat.id) == 'awaiting_id')
+def delete_product(message):
+    delete_id = message.text.strip()
+    conn = sqlite3.connect('products.sql')
+    cur = conn.cursor()
+    try:
+        cur.execute("DELETE FROM products WHERE id = ?", (delete_id,))
+        conn.commit()
+        bot.send_message(message.chat.id, 'Товар удален!')
+    except sqlite3.Error as e:
+        bot.send_message(message.chat.id, f"Произошла ошибка: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
+    # Убираем состояние пользователя после обработки запроса
+    del user_states[message.chat.id]
+
 
 @bot.message_handler(func=lambda message: message.text == 'Да✅')
 def yes(message):
