@@ -128,10 +128,8 @@ def bot_message(message):
         elif message.text == 'Наши товары🛍️':
             next_button.send_product(message)
 
-            # markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            # back = types.KeyboardButton('⬅️Назад')
-            # markup.add(back)
-            # bot.send_message(message.chat.id, 'Наши товары🛍️', reply_markup=markup)
+        elif message.text == 'Следующий товар➡️':
+            next_button.next_product(message)
 
         elif message.text == '⬅️Назад':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)

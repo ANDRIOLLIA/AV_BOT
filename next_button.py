@@ -47,8 +47,6 @@ def send_product(message):
     bot.send_message(message.chat.id, response, reply_markup=markup)
 
 
-# Обработчик нажатия на кнопку "Следующий товар"
-@bot.message_handler(func=lambda message: message.text == 'Следующий товар➡️')
 def next_product(message):
     global current_product_id
 
