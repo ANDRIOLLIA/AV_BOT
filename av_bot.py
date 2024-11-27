@@ -133,7 +133,6 @@ def bot_message(message):
         elif message.text == 'Наши товары🛍️':
             next_button.send_product(message)
 
-
         elif message.text == '⬅️Назад':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             goods = types.KeyboardButton('Наши товары🛍️')

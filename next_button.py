@@ -26,7 +26,7 @@ def send_product(message):
                    f"Описание: {product[2]}\n" \
                    f"Цена: {product[3]}"
     else:
-        response = "Список товаров закончился, нажмите кнопку '️⬅️Назад'"
+        response = '️⬅️Назад'
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     back = types.KeyboardButton('⬅️Назад')
@@ -45,7 +45,7 @@ def next_product(message):
                    f"Описание: {product[2]}\n" \
                    f"Цена: {product[3]}"
     else:
-        response = "Список товаров закончился, нажмите кнопку '️⬅️Назад'"
+        response = '⬅️Назад'
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     back = types.KeyboardButton('⬅️Назад')
@@ -53,3 +53,5 @@ def next_product(message):
 
     markup.add(back).add(next_prod)
     bot.send_message(message.chat.id, response, reply_markup=markup)
+
+
